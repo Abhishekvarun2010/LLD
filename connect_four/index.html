@@ -64,11 +64,26 @@
     .cell.red { background: #e63946; }
     .cell.yellow { background: #f9c74f; }
 
-    #new-game {
+    .actions {
+      display: flex;
+      justify-content: center;
+      gap: 12px;
       margin-top: 16px;
+    }
+
+    .actions button {
       padding: 10px 18px;
       color: white;
       background: #15253d;
+      border: 0;
+      border-radius: 8px;
+      cursor: pointer;
+      font-weight: bold;
+    }
+
+    .actions button:disabled {
+      opacity: 0.45;
+      cursor: not-allowed;
     }
   </style>
 </head>
@@ -78,13 +93,17 @@
     <p id="status">Red's turn</p>
     <div class="column-buttons" id="column-buttons"></div>
     <div id="board" aria-label="Connect Four board"></div>
-    <button id="new-game">New game</button>
+    <div class="actions">
+      <button id="undo" disabled>Undo move</button>
+      <button id="new-game">New game</button>
+    </div>
   </main>
 
   <script>
     const boardElement = document.querySelector("#board");
     const buttonsElement = document.querySelector("#column-buttons");
     const statusElement = document.querySelector("#status");
+    const undoButton = document.querySelector("#undo");
     let game;
 
     async function getGame() {
@@ -95,6 +114,13 @@
     async function reset() {
       const response = await fetch("/api/game", { method: "POST" });
       game = await response.json();
+      render();
+    }
+
+    async function undoMove() {
+      const response = await fetch("/api/undo", { method: "POST" });
+      const result = await response.json();
+      game = result.game;
       render();
     }
 
@@ -117,6 +143,8 @@
         buttonsElement.append(button);
       }
 
+      undoButton.disabled = !game.canUndo;
+
       if (game.state === "WON") {
         statusElement.textContent = `${game.winner} wins!`;
       } else if (game.state === "DRAW") {
@@ -138,6 +166,7 @@
     }
 
     document.querySelector("#new-game").addEventListener("click", reset);
+    undoButton.addEventListener("click", undoMove);
     getGame().then((data) => {
       game = data;
       render();

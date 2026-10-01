@@ -33,13 +33,16 @@ class Game:
     - currentPlayer: Player
     - state: GameState        // IN_PROGRESS, WON, DRAW
     - winner: Player?
+    - moves: Stack<Move>
 
     + Game(player1, player2)
     + makeMove(player, column) -> bool
+    + undo() -> bool
     + getCurrentPlayer() -> Player
     + getGameState() -> GameState
     + getWinner() -> Player?
     + getBoard() -> Board
+    + getMoves() -> List<Move>
 
 class Board:
     - rows: int = 6
@@ -49,9 +52,20 @@ class Board:
     + Board()
     + canPlace(column) -> bool
     + placeDisc(column, color) -> int
+    + clearCell(row, column) -> void
     + isFull() -> bool
     + checkWin(row, column, color) -> bool
     + getCell(row, column) -> DiscColor?
+
+class Move:
+    - player: Player
+    - row: int
+    - col: int
+
+    + Move(player, row, col)
+    + getPlayer() -> Player
+    + getRow() -> int
+    + getCol() -> int
 
 class Player:
     - name: string

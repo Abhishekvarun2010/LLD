@@ -35,6 +35,7 @@ def game_data(game: Game) -> dict[str, object]:
         "currentPlayer": current_player.get_name(),
         "currentColor": current_player.get_color().value.lower(),
         "winner": winner.get_name() if winner is not None else None,
+        "canUndo": game.can_undo(),
     }
 
 
@@ -62,6 +63,11 @@ class ConnectFourHandler(SimpleHTTPRequestHandler):
                 return
 
             accepted = self.game.make_move(self.game.get_current_player(), column)
+            self.send_json({"accepted": accepted, "game": game_data(self.game)})
+            return
+
+        if self.path == "/api/undo":
+            accepted = self.game.undo()
             self.send_json({"accepted": accepted, "game": game_data(self.game)})
             return
 

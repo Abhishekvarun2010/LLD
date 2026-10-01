@@ -65,3 +65,9 @@ class Board:
 
     def get_cell(self, row: int, column: int) -> DiscColor | None:
         return self.grid[row][column]
+
+    def clear_cell(self, row: int, column: int) -> None:
+        if 0 <= row < self.rows and 0 <= column < self.cols:
+            self.grid[row][column] = None
+
+    clearCell = clear_cell
